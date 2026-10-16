@@ -1,0 +1,10 @@
+Port 2222
+HostKey /home/node/.ssh/ssh_host_ed25519_key
+PidFile none
+UsePAM no
+
+AllowUsers node
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+
+SetEnv PATH=/home/node/.local/bin:/home/node/.bun/bin:/usr/local/bin:/usr/bin:/bin

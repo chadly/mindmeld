@@ -4,7 +4,7 @@ name: image
 on:
   push:
     branches: [master]
-    paths: [Dockerfile, .github/workflows/image.yml]
+    paths: [Dockerfile, scripts/**, .github/workflows/image.yml]
   workflow_dispatch:
 
 permissions:

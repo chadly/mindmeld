@@ -1,7 +1,7 @@
 FROM node:22-bookworm
 
 RUN apt-get update \
- && apt-get install -y --no-install-recommends git curl ca-certificates unzip ripgrep tini \
+ && apt-get install -y --no-install-recommends git curl ca-certificates unzip ripgrep tini openssh-server \
  && rm -rf /var/lib/apt/lists/*
 
 # bump these to upgrade; the image only changes when they do
@@ -11,6 +11,10 @@ ARG OPENCODE_VERSION=1.19.3
 
 RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION} @openai/codex@${CODEX_VERSION} opencode-ai@${OPENCODE_VERSION} \
  && npm cache clean --force
+
+# sshd runs as node (non-root), so it listens on 2222 and can only log in as node
+COPY scripts/sshd_config /etc/ssh/mindmeld_sshd_config
+COPY --chmod=755 scripts/mindmeld-start /usr/local/bin/mindmeld-start
 
 # non-root: claude refuses --dangerously-skip-permissions as root, and herdr/bun/plugins live in $HOME
 USER node
@@ -32,5 +36,8 @@ RUN mkdir -p .local/bin \
 ENV HOST=0.0.0.0
 EXPOSE 7317
 
+# ssh for herdr remote attach (herdr machine add ssh://node@<host>:2222); keys come from SSH_AUTHORIZED_KEYS
+EXPOSE 2222
+
 ENTRYPOINT ["tini", "--"]
-CMD ["herdr", "server"]
+CMD ["mindmeld-start"]
