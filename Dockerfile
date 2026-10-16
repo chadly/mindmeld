@@ -28,7 +28,7 @@ RUN mkdir -p .local/bin \
  && curl -fsSL https://bun.sh/install | bash -s "bun-v${BUN_VERSION}" \
  && herdr plugin install devswha/herdr-web-ui --ref v${HERDR_WEB_UI_VERSION} --yes
 
-# web ui binds inside the container; publish it as 127.0.0.1:7317 on the host and pair devices / set HERDR_WEB_TOKEN
+# web ui binds inside the container; publish port 7317 on the host and pair devices / set HERDR_WEB_TOKEN
 ENV HOST=0.0.0.0
 EXPOSE 7317
 
