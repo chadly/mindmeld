@@ -1,5 +1,6 @@
 Port 2222
-HostKey /home/node/.ssh/ssh_host_ed25519_key
+HostKey /home/node/.sshd/ssh_host_ed25519_key
+AuthorizedKeysFile /home/node/.sshd/authorized_keys
 PidFile none
 UsePAM no
 

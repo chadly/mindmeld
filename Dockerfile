@@ -21,6 +21,10 @@ USER node
 WORKDIR /home/node
 ENV PATH=/home/node/.local/bin:/home/node/.bun/bin:$PATH
 
+# the agents' ssh client dir; mount your own ~/.ssh over it (read-only) to lend them your keys.
+# sshd keeps its host key and authorized_keys in ~/.sshd so that mount can't disturb them
+RUN mkdir -m 700 .ssh
+
 ARG HERDR_VERSION=0.9.5
 ARG BUN_VERSION=1.4.3
 ARG HERDR_WEB_UI_VERSION=0.4.11

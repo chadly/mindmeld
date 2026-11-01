@@ -23,6 +23,18 @@ claude    # / codex / opencode
 
 Logins, herdr state, plugins and cloned projects live in the `mindmeld-home` volume (`/home/node`), so they survive restarts and image updates.
 
+### Lending the Agents Your SSH Keys
+
+Mount your `~/.ssh` read-only over the container's:
+
+```sh
+  -v ~/.ssh:/home/node/.ssh:ro
+```
+
+ssh inside then uses your keys, `config` and `known_hosts` as they are, so `git clone git@github.com:...` just works. Your uid must be 1000 (the container's `node`), or ssh rejects the key files as not yours. Read-only means ssh can't record new hosts in `known_hosts`; hosts you have already connected to from outside are fine.
+
+sshd (port 2222, for `herdr machine add ssh://node@<host>:2222`, logins from `SSH_AUTHORIZED_KEYS`) keeps its host key and `authorized_keys` in `~/.sshd`, so your mounted `authorized_keys` grants nothing.
+
 ## Running Locally
 
 ```sh
