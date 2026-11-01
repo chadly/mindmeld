@@ -1,6 +1,6 @@
 # mindmeld
 
-A Docker image that runs [herdr](https://herdr.dev/) with coding agents ([Claude Code](https://claude.com/claude-code), [Codex](https://github.com/openai/codex), [opencode](https://opencode.ai/)) and the [herdr web UI](https://github.com/devswha/herdr-web-ui), so you can drive the agents' terminals from a browser.
+A Docker image that runs [herdr](https://herdr.dev/) with coding agents ([Claude Code](https://claude.com/claude-code), [Codex](https://github.com/openai/codex), [opencode](https://opencode.ai/)) and the [herdr web UI](https://github.com/devswha/herdr-web-ui), so you can drive the agents' terminals from a browser. `gh` and [apm](https://github.com/microsoft/apm) are included for the agents' use.
 
 ## Running the Deployed Image
 

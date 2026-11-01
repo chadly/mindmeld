@@ -17,6 +17,15 @@ ARG GH_VERSION=2.103.3
 RUN curl -fsSL https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz \
  | tar -xz -C /usr/local --strip-components=1 gh_${GH_VERSION}_linux_amd64/bin/gh
 
+# apm (https://github.com/microsoft/apm) materializes a repo's agent skills and MCP servers. Same
+# lib/bin layout as its installer, but under /usr/local: anything in /home/node sits in the volume
+# and would never upgrade with the image
+ARG APM_VERSION=0.35.0
+RUN mkdir -p /usr/local/lib/apm \
+ && curl -fsSL https://github.com/microsoft/apm/releases/download/v${APM_VERSION}/apm-linux-x86_64.tar.gz \
+  | tar -xz -C /usr/local/lib/apm --strip-components=1 \
+ && ln -s /usr/local/lib/apm/apm /usr/local/bin/apm
+
 # sshd runs as node (non-root), so it listens on 2222 and can only log in as node
 COPY scripts/sshd_config /etc/ssh/mindmeld_sshd_config
 COPY --chmod=755 scripts/mindmeld-start /usr/local/bin/mindmeld-start
