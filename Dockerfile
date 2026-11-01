@@ -1,4 +1,4 @@
-FROM node:22-bookworm
+FROM node:22-trixie
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends git curl ca-certificates unzip ripgrep tini openssh-server \
