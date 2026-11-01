@@ -22,7 +22,7 @@ WORKDIR /home/node
 ENV PATH=/home/node/.local/bin:/home/node/.bun/bin:$PATH
 
 # the agents' ssh client dir; mount your own ~/.ssh over it (read-only) to lend them your keys.
-# sshd keeps its host key and authorized_keys in ~/.sshd so that mount can't disturb them
+# sshd keeps its host key in ~/.sshd so that mount can't disturb it
 RUN mkdir -m 700 .ssh
 
 ARG HERDR_VERSION=0.9.5
@@ -40,7 +40,7 @@ RUN mkdir -p .local/bin \
 ENV HOST=0.0.0.0
 EXPOSE 7317
 
-# ssh for herdr remote attach (herdr machine add ssh://node@<host>:2222); keys come from SSH_AUTHORIZED_KEYS
+# ssh for herdr remote attach (herdr machine add ssh://node@<host>:2222); logins via ~/.ssh/authorized_keys
 EXPOSE 2222
 
 ENTRYPOINT ["tini", "--"]

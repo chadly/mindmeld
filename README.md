@@ -33,7 +33,13 @@ Mount your `~/.ssh` read-only over the container's:
 
 ssh inside then uses your keys, `config` and `known_hosts` as they are, so `git clone git@github.com:...` just works. Your uid must be 1000 (the container's `node`), or ssh rejects the key files as not yours. Read-only means ssh can't record new hosts in `known_hosts`; hosts you have already connected to from outside are fine.
 
-sshd (port 2222, for `herdr machine add ssh://node@<host>:2222`, logins from `SSH_AUTHORIZED_KEYS`) keeps its host key and `authorized_keys` in `~/.sshd`, so your mounted `authorized_keys` grants nothing.
+The container also runs sshd on port 2222 for `herdr machine add ssh://node@<host>:2222`. It reads `~/.ssh/authorized_keys` like any sshd, so with your `~/.ssh` mounted, the keys that log in to the host log in to the container too. Without the mount, put a key in the volume:
+
+```sh
+docker exec -i mindmeld sh -c 'cat > ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys' < ~/.ssh/id_ed25519.pub
+```
+
+sshd's own host key lives in `~/.sshd`, so it survives restarts and a read-only `~/.ssh`.
 
 ## Running Locally
 

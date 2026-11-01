@@ -5,15 +5,10 @@ set -e
 # an unrelated process, and the web ui then refuses to start
 rm -rf ~/.config/herdr-web-ui/updates/*/supervisor.lock
 
-# sshd's host key and authorized_keys live in ~/.sshd, in the home volume: the host key survives
-# restarts, and ~/.ssh stays free for a read-only mount of the host's own ssh dir
+# sshd's host key lives in ~/.sshd, in the home volume: it survives restarts, and ~/.ssh stays
+# free for a read-only mount of the host's own ssh dir (logins read ~/.ssh/authorized_keys as usual)
 mkdir -p -m 700 ~/.sshd
 [ -f ~/.sshd/ssh_host_ed25519_key ] || ssh-keygen -q -t ed25519 -N '' -f ~/.sshd/ssh_host_ed25519_key
-
-if [ -n "$SSH_AUTHORIZED_KEYS" ]; then
-  printf '%s\n' "$SSH_AUTHORIZED_KEYS" > ~/.sshd/authorized_keys
-  chmod 600 ~/.sshd/authorized_keys
-fi
 
 # ponytail: sshd daemonizes under tini and isn't restarted if it dies; restart the container
 /usr/sbin/sshd -f /etc/ssh/mindmeld_sshd_config
