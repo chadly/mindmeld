@@ -5,10 +5,14 @@ set -e
 # an unrelated process, and the web ui then refuses to start
 rm -rf ~/.config/herdr-web-ui/updates/*/supervisor.lock
 
-# sshd's host key lives in ~/.sshd, in the home volume: it survives restarts, and ~/.ssh stays
-# free for a read-only mount of the host's own ssh dir (logins read ~/.ssh/authorized_keys as usual)
+# sshd's host key lives in ~/.sshd, in the home volume, so it survives restarts
 mkdir -p -m 700 ~/.sshd
 [ -f ~/.sshd/ssh_host_ed25519_key ] || ssh-keygen -q -t ed25519 -N '' -f ~/.sshd/ssh_host_ed25519_key
+
+# one token for gh and git: gh becomes git's credential helper for github.com (in ~/.gitconfig, in the volume)
+if [ -n "$GITHUB_TOKEN" ]; then
+  gh auth setup-git
+fi
 
 # ponytail: sshd daemonizes under tini and isn't restarted if it dies; restart the container
 /usr/sbin/sshd -f /etc/ssh/mindmeld_sshd_config

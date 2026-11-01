@@ -1,5 +1,7 @@
 Port 2222
 HostKey /home/node/.sshd/ssh_host_ed25519_key
+# the second one is for a read-only mount of the host's own authorized_keys
+AuthorizedKeysFile .ssh/authorized_keys /run/authorized_keys
 PidFile none
 UsePAM no
 

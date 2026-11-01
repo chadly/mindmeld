@@ -8,6 +8,7 @@ A Docker image that runs [herdr](https://herdr.dev/) with coding agents ([Claude
 docker run -d --name mindmeld --restart unless-stopped \
   -p 127.0.0.1:7317:7317 \
   -e HERDR_WEB_TOKEN=<token> \
+  -e GITHUB_TOKEN=<fine-grained token> \
   -v mindmeld-home:/home/node \
   ghcr.io/chadly/mindmeld:latest
 ```
@@ -23,23 +24,19 @@ claude    # / codex / opencode
 
 Logins, herdr state, plugins and cloned projects live in the `mindmeld-home` volume (`/home/node`), so they survive restarts and image updates.
 
-### Lending the Agents Your SSH Keys
+### GitHub
 
-Mount your `~/.ssh` read-only over the container's:
+Pass `GITHUB_TOKEN`, a [fine-grained personal access token](https://github.com/settings/personal-access-tokens/new) scoped to the repos the agents may work on (Contents and Pull requests: read and write). The start script runs `gh auth setup-git`, so `gh` and `git` over https both use it. To let the agents at another repo, add it to the token on GitHub; nothing changes in the container.
 
-```sh
-  -v ~/.ssh:/home/node/.ssh:ro
-```
+### SSH
 
-ssh inside then uses your keys, `config` and `known_hosts` as they are, so `git clone git@github.com:...` just works. Your uid must be 1000 (the container's `node`), or ssh rejects the key files as not yours. Read-only means ssh can't record new hosts in `known_hosts`; hosts you have already connected to from outside are fine.
-
-The container also runs sshd on port 2222 for `herdr machine add ssh://node@<host>:2222`. It reads `~/.ssh/authorized_keys` like any sshd, so with your `~/.ssh` mounted, the keys that log in to the host log in to the container too. Without the mount, put a key in the volume:
+sshd on port 2222 (`herdr machine add ssh://node@<host>:2222`) accepts keys from the container's own `~/.ssh/authorized_keys` and from a file mounted read-only at `/run/authorized_keys`, so the host's own file works as-is:
 
 ```sh
-docker exec -i mindmeld sh -c 'cat > ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys' < ~/.ssh/id_ed25519.pub
+  -v ~/.ssh/authorized_keys:/run/authorized_keys:ro
 ```
 
-sshd's own host key lives in `~/.sshd`, so it survives restarts and a read-only `~/.ssh`.
+Docker binds the file's inode, so restart the container after editing it. sshd's host key lives in `~/.sshd` and survives restarts.
 
 ## Running Locally
 

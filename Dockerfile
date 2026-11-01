@@ -12,6 +12,11 @@ ARG OPENCODE_VERSION=1.19.3
 RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION} @openai/codex@${CODEX_VERSION} opencode-ai@${OPENCODE_VERSION} \
  && npm cache clean --force
 
+# gh: the agents' GitHub client, and git's credential helper once GITHUB_TOKEN is set (mindmeld-start)
+ARG GH_VERSION=2.103.3
+RUN curl -fsSL https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz \
+ | tar -xz -C /usr/local --strip-components=1 gh_${GH_VERSION}_linux_amd64/bin/gh
+
 # sshd runs as node (non-root), so it listens on 2222 and can only log in as node
 COPY scripts/sshd_config /etc/ssh/mindmeld_sshd_config
 COPY --chmod=755 scripts/mindmeld-start /usr/local/bin/mindmeld-start
@@ -21,8 +26,7 @@ USER node
 WORKDIR /home/node
 ENV PATH=/home/node/.local/bin:/home/node/.bun/bin:$PATH
 
-# the agents' ssh client dir; mount your own ~/.ssh over it (read-only) to lend them your keys.
-# sshd keeps its host key in ~/.sshd so that mount can't disturb it
+# the agents' own ssh dir; sshd keeps its host key in ~/.sshd so this stays theirs
 RUN mkdir -m 700 .ssh
 
 ARG HERDR_VERSION=0.9.5
@@ -41,6 +45,7 @@ ENV HOST=0.0.0.0
 EXPOSE 7317
 
 # ssh for herdr remote attach (herdr machine add ssh://node@<host>:2222); logins via ~/.ssh/authorized_keys
+# or a file mounted at /run/authorized_keys
 EXPOSE 2222
 
 ENTRYPOINT ["tini", "--"]

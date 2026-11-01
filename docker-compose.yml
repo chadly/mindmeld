@@ -11,6 +11,7 @@ services:
     environment:
       # anyone reaching the port can drive the agents' terminals without this
       HERDR_WEB_TOKEN: ${HERDR_WEB_TOKEN:?set HERDR_WEB_TOKEN in .env}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
     volumes:
       - home:/home/node # agent logins, herdr state, plugin, projects
 
